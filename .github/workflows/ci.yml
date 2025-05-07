@@ -30,7 +30,7 @@ jobs:
           done
       - name: Run tests
         run: |
-          docker compose exec web bash -c "cd backend && pytest"
+          docker compose exec web bash -c "cd backend && export PYTHONPATH=$(pwd) && export DJANGO_SETTINGS_MODULE=myproject.settings && pytest"
       - name: Stop Docker containers
         run: |
           docker compose down 
