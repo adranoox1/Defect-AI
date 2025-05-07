@@ -1,0 +1,89 @@
+{% extends "myapp/base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="cyber-heading-container">
+        <h1 class="cyber-heading">OBJECT <span class="accent">DETAILS</span></h1>
+    </div>
+
+    <div class="cyber-form-container">
+        <div class="cyber-detail-grid">
+            <!-- Object ID -->
+            <div class="detail-item">
+                <div class="detail-label">ID</div>
+                <div class="detail-value">{{ object.id }}</div>
+            </div>
+
+            <!-- Name -->
+            <div class="detail-item">
+                <div class="detail-label">NAME</div>
+                <div class="detail-value">{{ object.name }}</div>
+            </div>
+   <div class="detail-value">
+
+            <div class="detail-item">
+                <div class="detail-label">STATUS</div>
+                         <!-- Status -->
+                    <span class="status-badge status-{{ object.status }}">
+                        {{ object.get_status_display }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Inspection Date -->
+            <div class="detail-item">
+                <div class="detail-label">INSPECTION DATE</div>
+                <div class="detail-value">{{ object.inspection_date }}</div>
+            </div>
+
+            <!-- Description -->
+            <div class="detail-item full-width">
+                <div class="detail-label">DESCRIPTION</div>
+                <div class="detail-value description-box">{{ object.description|linebreaks|default:"No description provided" }}</div>
+            </div>
+
+            <!-- Image if available -->
+            {% if object.image_url %}
+            <div class="detail-item full-width">
+                <div class="detail-label">IMAGE</div>
+                <div class="detail-value">
+                    <img src="{{ object.image_url }}" alt="{{ object.name }}" class="detail-image">
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Created/Updated Info -->
+            <div class="detail-item">
+                <div class="detail-label">CREATED</div>
+                <div class="detail-value">{{ object.created_at|date:"Y-m-d H:i" }}</div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">LAST UPDATED</div>
+                <div class="detail-value">{{ object.updated_at|date:"Y-m-d H:i" }}</div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="cyber-button-group mt-4">
+            {% if user.is_staff %}
+            <a href="{% url 'objetdefectueux_edit' object.pk %}" class="cyber-button submit-btn">
+                EDIT
+            </a>
+            <a href="{% url 'objetdefectueux_delete' object.pk %}" class="cyber-button cancel-btn">
+                DELETE
+            </a>
+            {% endif %}
+            <a href="{% url 'objetdefectueux_list' %}" class="cyber-button">
+                BACK TO LIST
+            </a>
+            <a href="{% url 'yolo_analysis' object.pk %}" class="cyber-button analyze-btn">
+                <i class="fas fa-robot"></i> YOLO ANALYSIS
+            </a>
+            <a href="{% url 'basic_analysis' object.pk %}" class="cyber-button analyze-btn">
+                <i class="fas fa-search"></i> BASIC ANALYSIS
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,42 @@
+{% extends "myapp/base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="cyber-heading-container">
+        <h1 class="cyber-heading">
+            {% if form.instance.pk %}EDIT{% else %}ADD{% endif %} 
+            <span class="accent">DEFECTIVE</span> OBJECT
+        </h1>
+    </div>
+
+    <div class="cyber-form-container">
+        <form method="post" class="cyber-form" novalidate>
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="cyber-form-group">
+                <label for="{{ field.id_for_label }}" class="cyber-label">
+                    {{ field.label|upper }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <div class="cyber-error">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+                {% if field.help_text %}
+                    <div class="cyber-help">{{ field.help_text }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="cyber-button-group">
+                <button type="submit" class="cyber-button submit-btn">
+                    {% if form.instance.pk %}UPDATE{% else %}CREATE{% endif %}
+                </button>
+                <a href="{% url 'objetdefectueux_list' %}" class="cyber-button cancel-btn">CANCEL</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

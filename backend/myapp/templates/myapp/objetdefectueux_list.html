@@ -1,0 +1,114 @@
+{% extends "myapp/base.html" %}
+{% block content %}
+<div class="container">
+    <div class="cyber-heading-container">
+        <h1 class="cyber-heading">
+            LIST OF <span class="accent">DEFECTIVE</span> OBJECTS
+        </h1>
+    </div>
+    
+    <!-- Search and Filter Form -->
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <input type="text" name="q" class="form-control" placeholder="Search..." value="{{ request.GET.q }}">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-control">
+                    <option value="">All Statuses</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_from" class="form-control" value="{{ request.GET.date_from }}">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_to" class="form-control" value="{{ request.GET.date_to }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Add Create Button - Check for staff/admin status -->
+    {% if user.is_staff %}
+    <div class="mb-4">
+        <a href="{% url 'objetdefectueux_create' %}" class="cyber-button submit-btn">
+            <i class="fas fa-plus"></i> ADD NEW OBJECT
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Inspection Date</th>
+                    <th>Status</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for objet in objets %}
+                <tr>
+                    <td>{{ objet.name }}</td>
+                    <td>{{ objet.inspection_date }}</td>
+                    <td>
+                        <span class="status-badge status-{{ objet.status }}">
+                            {{ objet.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ objet.description|truncatewords:20 }}</td>
+                    <td>
+                        <a href="{% url 'objetdefectueux_detail' pk=objet.pk %}" class="cyber-button info-btn btn-sm">
+                            DETAILS
+                        </a>
+                        {% if user.is_staff %}
+                        <a href="{% url 'objetdefectueux_edit' objet.pk %}" class="cyber-button submit-btn btn-sm">
+                            EDIT
+                        </a>
+                        <a href="{% url 'objetdefectueux_delete' objet.pk %}" class="cyber-button cancel-btn btn-sm">
+                            DELETE
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No objects found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if objets.has_other_pages %}
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if objets.has_previous %}
+            <li class="page-item">
+                <a class="page-link cyber-button" href="?page={{ objets.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for num in objets.paginator.page_range %}
+            <li class="page-item {% if objets.number == num %}active{% endif %}">
+                <a class="page-link cyber-button" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            
+            {% if objets.has_next %}
+            <li class="page-item">
+                <a class="page-link cyber-button" href="?page={{ objets.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %} 

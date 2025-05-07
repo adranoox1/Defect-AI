@@ -1,0 +1,107 @@
+{% extends "myapp/base.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- Bouton Retour -->
+    <div class="mb-4">
+        <a href="{% url 'objetdefectueux_detail' object.pk %}" class="cyber-button back-btn">
+            <i class="fas fa-arrow-left"></i> RETOUR À L'OBJET
+        </a>
+    </div>
+
+    <!-- En-tête -->
+    <div class="cyber-heading-container mb-4">
+        <h1 class="cyber-heading">ANALYSE <span class="accent">YOLO</span></h1>
+        <p class="cyber-subtitle">Objet: {{ object }}</p>
+    </div>
+
+    <!-- Section Upload -->
+    <div class="cyber-panel mb-4">
+        <h2 class="cyber-subheading">NOUVELLE ANALYSE</h2>
+        <form method="post" enctype="multipart/form-data" class="cyber-form">
+            {% csrf_token %}
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="custom-file">
+                        <input type="file" name="image" accept="image/*" class="form-control" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="cyber-button submit-btn w-100">
+                        <i class="fas fa-robot"></i> ANALYSER AVEC YOLO
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages mb-4">
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} cyber-alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Résultats d'Analyse -->
+    {% if analyses %}
+    <div class="cyber-panel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="cyber-subheading mb-0">HISTORIQUE DES ANALYSES</h2>
+        </div>
+
+        <div class="row">
+            {% for analysis in analyses %}
+            <div class="col-md-6 mb-4">
+                <div class="analysis-card">
+                    <div class="analysis-header">
+                        <span class="timestamp">{{ analysis.analysis_date|date:"Y-m-d H:i" }}</span>
+                        <span class="status-badge {% if analysis.is_defective %}status-error{% else %}status-success{% endif %}">
+                            {{ analysis.is_defective|yesno:"DÉFECTUEUX,NORMAL" }}
+                        </span>
+                    </div>
+                    
+                    <div class="analysis-images">
+                        <div class="original-image">
+                            <h4>Image Originale</h4>
+                            <img src="{{ analysis.image.url }}" alt="Original" class="img-fluid">
+                        </div>
+                        {% if analysis.annotated_image %}
+                        <div class="annotated-image">
+                            <h4>Image Analysée</h4>
+                            <img src="{{ analysis.annotated_image.url }}" alt="Annotée" class="img-fluid">
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="analysis-details">
+                        <div class="confidence">
+                            Confiance: {{ analysis.confidence_score|floatformat:1 }}%
+                        </div>
+                        <div class="recommendations">
+                            {{ analysis.recommendations }}
+                        </div>
+                        {% if analysis.detections %}
+                        <div class="detections">
+                            <h4>Objets Détectés:</h4>
+                            <ul>
+                            {% for detection in analysis.detections %}
+                                <li>
+                                    {{ detection.class }} ({{ detection.confidence|floatformat:2 }})
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

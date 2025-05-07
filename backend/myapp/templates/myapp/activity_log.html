@@ -1,0 +1,114 @@
+{% extends "myapp/base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="cyber-heading-container">
+        <h1 class="cyber-heading">ACTIVITY <span class="accent">LOGS</span></h1>
+    </div>
+
+    <!-- Filters -->
+    <div class="cyber-form-container mb-4">
+        <form method="get" class="row g-3">
+            <div class="col-md-2">
+                <select name="user" class="form-control">
+                    <option value="">All Users</option>
+                    {% for user in users %}
+                                              <option value="{{ user.username }}" {% if current_filters.user == user.username %}selected{% endif %}>
+      {{ user.username }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="action" class="form-control">
+                    <option value="">All Actions</option>
+                    {% for code, name in action_types %}
+                        <option value="{{ code }}" {% if current_filters.action == code %}selected{% endif %}>
+                            {{ name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_from" class="form-control" value="{{ current_filters.date_from }}" placeholder="From Date">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_to" class="form-control" value="{{ current_filters.date_to }}" placeholder="To Date">
+            </div>
+            <div class="col-md-2">
+                <input type="text" name="search" class="form-control" value="{{ current_filters.search }}" placeholder="Search...">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="cyber-button submit-btn w-100">FILTER</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Logs Table -->
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Object</th>
+                    <th>Details</th>
+                    <th>IP Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                    <td>{{ log.user.username|default:"System" }}</td>
+                    <td>
+                        <span class="status-badge status-{{ log.action|lower }}">
+                            {{ log.get_action_display }}
+                        </span>
+                    </td>
+                    <td>{{ log.object_name|default:"-" }}</td>
+                    <td>{{ log.details|default:"-" }}</td>
+                    <td>{{ log.ip_address|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No logs found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if logs.has_other_pages %}
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if logs.has_previous %}
+                <li class="page-item">
+                    <a class="page-link cyber-button" href="?page={{ logs.previous_page_number }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        Previous
+                    </a>
+                </li>
+            {% endif %}
+            
+            {% for num in logs.paginator.page_range %}
+                <li class="page-item {% if logs.number == num %}active{% endif %}">
+                    <a class="page-link cyber-button" href="?page={{ num }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        {{ num }}
+                    </a>
+                </li>
+            {% endfor %}
+            
+            {% if logs.has_next %}
+                <li class="page-item">
+                    <a class="page-link cyber-button" href="?page={{ logs.next_page_number }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        Next
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %} 

@@ -1,0 +1,95 @@
+{% extends "myapp/base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="cyber-heading-container">
+        <h1 class="cyber-heading">AI <span class="accent">ANALYSIS</span></h1>
+    </div>
+
+    <div class="row">
+        <!-- Image Upload Section -->
+        <div class="col-md-6">
+            <div class="cyber-panel">
+                <h3 class="cyber-subheading">UPLOAD IMAGE</h3>
+                <form method="post" enctype="multipart/form-data" class="cyber-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Select Image for Analysis</label>
+                        <input type="file" name="image" accept="image/*" class="form-control" required>
+                    </div>
+                    <button type="submit" class="cyber-button submit-btn">ANALYZE</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Analysis Results Section -->
+        <div class="col-md-6">
+            {% if analysis %}
+            <div class="cyber-panel">
+                <h3 class="cyber-subheading">ANALYSIS RESULTS</h3>
+                
+                <div class="analysis-result">
+                    <div class="result-image">
+                        <img src="{{ analysis.image.url }}" alt="Analyzed Image" class="img-fluid">
+                    </div>
+                    
+                    <div class="result-details">
+                        <div class="status-indicator {% if analysis.is_defective %}defective{% else %}normal{% endif %}">
+                            {{ analysis.is_defective|yesno:"DEFECTIVE,NORMAL" }}
+                        </div>
+                        
+                        <div class="confidence-meter">
+                            <label>Confidence: {{ analysis.confidence_score|floatformat:2 }}%</label>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ analysis.confidence_score }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendations">
+                            <h4>RECOMMENDATIONS</h4>
+                            <p>{{ analysis.recommendations }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Analysis History -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="cyber-panel">
+                <h3 class="cyber-subheading">ANALYSIS HISTORY</h3>
+                <div class="table-responsive">
+                    <table class="table table-dark">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Result</th>
+                                <th>Confidence</th>
+                                <th>Recommendations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for analysis in object.imageanalysis_set.all|dictsortreversed:"analysis_date" %}
+                            <tr>
+                                <td>{{ analysis.analysis_date|date:"Y-m-d H:i" }}</td>
+                                <td>
+                                    <span class="status-badge {% if analysis.is_defective %}status-error{% else %}status-success{% endif %}">
+                                        {{ analysis.is_defective|yesno:"DEFECTIVE,NORMAL" }}
+                                    </span>
+                                </td>
+                                <td>{{ analysis.confidence_score|floatformat:2 }}%</td>
+                                <td>{{ analysis.recommendations }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+venv/
+postgres_data/
+.pytest_cache/
+db.sqlite3 

@@ -1,0 +1,21 @@
+{% extends "myapp/base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="cyber-heading-container">
+        <h1 class="cyber-heading">CONFIRM <span class="accent">DELETION</span></h1>
+    </div>
+    
+    <div class="cyber-form-container">
+        <p class="text-center mb-4">
+            Are you sure you want to delete "{{ objet.name }}"?
+        </p>
+        
+        <form method="post" class="text-center">
+            {% csrf_token %}
+            <button type="submit" class="cyber-button cancel-btn">CONFIRM DELETE</button>
+            <a href="{% url 'objetdefectueux_list' %}" class="cyber-button submit-btn">CANCEL</a>
+        </form>
+    </div>
+</div>
+{% endblock %} 
