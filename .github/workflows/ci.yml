@@ -30,7 +30,7 @@ jobs:
           done
       - name: Run tests
         run: |
-          docker compose exec web pytest
+          docker compose exec web bash -c "cd backend && pytest"
       - name: Stop Docker containers
         run: |
           docker compose down 
